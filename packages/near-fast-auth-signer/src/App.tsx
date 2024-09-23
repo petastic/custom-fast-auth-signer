@@ -19,6 +19,7 @@ import VerifyEmailPage from './components/VerifyEmail/verify-email';
 import FastAuthController from './lib/controller';
 import './styles/theme.css';
 import './styles/globals.css';
+import './styles/petastic.css';
 import FirestoreController from './lib/firestoreController';
 import GlobalStyle from './styles/index';
 import { initAnalytics } from './utils/analytics';

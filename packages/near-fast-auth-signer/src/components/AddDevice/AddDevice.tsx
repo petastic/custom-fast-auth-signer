@@ -15,51 +15,56 @@ import { getAuthState } from '../../hooks/useAuthState';
 import useFirebaseUser from '../../hooks/useFirebaseUser';
 import useIframeDialogConfig from '../../hooks/useIframeDialogConfig';
 import { useInvalidContractId } from '../../hooks/useInvalidContractId';
-import WalletSvg from '../../Images/WalletSvg';
-import { Button } from '../../lib/Button';
 import FirestoreController from '../../lib/firestoreController';
 import Input from '../../lib/Input/Input';
 import { openToast } from '../../lib/Toast';
 import {
-  decodeIfTruthy, inIframe, isUrlNotJavascriptProtocol
+  decodeIfTruthy,
+  inIframe,
+  isUrlNotJavascriptProtocol,
 } from '../../utils';
 import { recordEvent } from '../../utils/analytics';
 import { basePath } from '../../utils/config';
 import { NEAR_MAX_ALLOWANCE } from '../../utils/constants';
-import environment from '../../utils/environment';
 import { checkFirestoreReady, firebaseAuth } from '../../utils/firebase';
 import ErrorSvg from '../CreateAccount/icons/ErrorSvg';
 import { FormContainer, StyledContainer } from '../Layout';
-import { Separator, SeparatorWrapper } from '../Login/Login.style';
+import { CustomButton } from '../Petastic/Forms/CustomButton';
 import { getMultiChainContract } from '../SignMultichain/utils/utils';
-import SocialLogin from '../SocialLogin/SocialLogin';
 
 const ErrorContainer = styled.div`
-.stats-message {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  .stats-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 
-  span {
-    flex: 1;
-  }
+    span {
+      flex: 1;
+    }
 
-  svg {
-    flex-shrink: 0;
-  }
+    svg {
+      flex-shrink: 0;
+    }
 
-  &.error {
-    color: #a81500;
-  }
+    &.error {
+      color: #a81500;
+    }
 
-  &.success {
-    color: #197650;
+    &.success {
+      color: #197650;
+    }
   }
-}
 `;
 
 export const handleCreateAccount = async ({
-  accountId, email, isRecovery, success_url, failure_url, public_key, contract_id, methodNames
+  accountId,
+  email,
+  isRecovery,
+  success_url,
+  failure_url,
+  public_key,
+  contract_id,
+  methodNames,
 }) => {
   const searchParams = new URLSearchParams({
     ...(accountId ? { accountId } : {}),
@@ -68,12 +73,14 @@ export const handleCreateAccount = async ({
     ...(failure_url ? { failure_url } : {}),
     ...(public_key ? { public_key_lak: public_key } : {}),
     ...(contract_id ? { contract_id } : {}),
-    ...(methodNames ? { methodNames } : {})
+    ...(methodNames ? { methodNames } : {}),
   });
 
   await sendSignInLinkToEmail(firebaseAuth, email, {
     url: encodeURI(
-      `${window.location.origin}${basePath ? `/${basePath}` : ''}/auth-callback?${searchParams.toString()}`,
+      `${window.location.origin}${
+        basePath ? `/${basePath}` : ''
+      }/auth-callback?${searchParams.toString()}`
     ),
     handleCodeInApp: true,
   });
@@ -84,7 +91,7 @@ export const handleCreateAccount = async ({
 };
 
 const schema = yup.object().shape({
-  email:    yup
+  email: yup
     .string()
     .email('Please enter a valid email address')
     .required('Please enter a valid email address'),
@@ -92,7 +99,8 @@ const schema = yup.object().shape({
 
 // TODO: remove condition when we release on mainnet
 const AddDeviceForm = styled(FormContainer)`
-  height: ${environment.NETWORK_ID === 'testnet' ? '560px;' : '420px;'}
+  min-height: 275px;
+  padding: 0 20px;
   gap: 18px;
   justify-content: center;
 `;
@@ -104,7 +112,7 @@ function AddDevicePage() {
 
   const [searchParams] = useSearchParams();
   // Load user from firebase
-  const { loading: firebaseUserLoading, user: firebaseUser } = useFirebaseUser();
+  const { loading: firebaseUserLoading, user: firebaseUser } =    useFirebaseUser();
   // Set loading for either actions: addDevice or handleAuthCallback
   const [inFlight, setInFlight] = useState(false);
   // Set loading for the authentication process after submit
@@ -116,11 +124,15 @@ function AddDevicePage() {
   const [wasPassKeyPrompted, setWasPassKeyPrompted] = useState(false);
   const [passkeyAuthError, setPasskeyAuthError] = useState(false);
   const {
-    register, handleSubmit, setValue, getValues, formState: { errors }
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
   } = useForm({
-    resolver:      yupResolver(schema),
-    mode:          'all',
-    defaultValues
+    resolver: yupResolver(schema),
+    mode:     'all',
+    defaultValues,
   });
 
   const navigate = useNavigate();
@@ -130,95 +142,122 @@ function AddDevicePage() {
   }
   useInvalidContractId(getMultiChainContract(), 'addDeviceError');
 
-  const addDevice = useCallback(async (data: any) => {
-    setInFlight(true);
+  const addDevice = useCallback(
+    async (data: any) => {
+      setInFlight(true);
 
-    // if different user is logged in, sign out
-    await firebaseAuth.signOut();
+      // if different user is logged in, sign out
+      await firebaseAuth.signOut();
 
-    const success_url = searchParams.get('success_url');
-    const failure_url = searchParams.get('failure_url');
-    const public_key =  searchParams.get('public_key');
-    const methodNames = searchParams.get('methodNames');
-    const contract_id = searchParams.get('contract_id');
+      const success_url = searchParams.get('success_url');
+      const failure_url = searchParams.get('failure_url');
+      const public_key = searchParams.get('public_key');
+      const methodNames = searchParams.get('methodNames');
+      const contract_id = searchParams.get('contract_id');
 
-    try {
-      await handleCreateAccount({
-        accountId:   null,
-        email:       data.email,
-        isRecovery:  true,
-        success_url,
-        failure_url,
-        public_key,
-        contract_id,
-        methodNames,
-      });
-      const newSearchParams = new URLSearchParams({
-        email:      data.email,
-        isRecovery: 'true',
-        ...(success_url ? { success_url } : {}),
-        ...(failure_url ? { failure_url } : {}),
-        ...(public_key ? { public_key_lak: public_key } : {}),
-        ...(contract_id ? { contract_id } : {}),
-        ...(methodNames ? { methodNames } : {})
-      });
-      navigate(`/verify-email?${newSearchParams.toString()}`);
-    } catch (error: any) {
-      console.log(error);
-      const errorMessage = typeof error?.message === 'string' ? error.message : 'Something went wrong';
-      window.parent.postMessage({
-        type:    'addDeviceError',
-        message: errorMessage
-      }, '*');
+      try {
+        await handleCreateAccount({
+          accountId:  null,
+          email:      data.email,
+          isRecovery: true,
+          success_url,
+          failure_url,
+          public_key,
+          contract_id,
+          methodNames,
+        });
+        const newSearchParams = new URLSearchParams({
+          email:      data.email,
+          isRecovery: 'true',
+          ...(success_url ? { success_url } : {}),
+          ...(failure_url ? { failure_url } : {}),
+          ...(public_key ? { public_key_lak: public_key } : {}),
+          ...(contract_id ? { contract_id } : {}),
+          ...(methodNames ? { methodNames } : {}),
+        });
+        navigate(`/verify-email?${newSearchParams.toString()}`);
+      } catch (error: any) {
+        console.log(error);
+        const errorMessage =          typeof error?.message === 'string'
+          ? error.message
+          : 'Something went wrong';
+        window.parent.postMessage(
+          {
+            type:    'addDeviceError',
+            message: errorMessage,
+          },
+          '*'
+        );
 
-      openToast({
-        type:  'ERROR',
-        title: errorMessage,
-      });
-    } finally {
-      setInFlight(false);
-    }
-  }, [navigate, searchParams]);
+        openToast({
+          type:  'ERROR',
+          title: errorMessage,
+        });
+      } finally {
+        setInFlight(false);
+      }
+    },
+    [navigate, searchParams]
+  );
 
   const handleAuthCallback = useCallback(async () => {
     setInFlight(true);
-    const success_url = isUrlNotJavascriptProtocol(searchParams.get('success_url')) && decodeIfTruthy(searchParams.get('success_url'));
-    const public_key =  decodeIfTruthy(searchParams.get('public_key'));
+    const success_url =      isUrlNotJavascriptProtocol(searchParams.get('success_url'))
+      && decodeIfTruthy(searchParams.get('success_url'));
+    const public_key = decodeIfTruthy(searchParams.get('public_key'));
     const methodNames = decodeIfTruthy(searchParams.get('methodNames'));
     const contract_id = decodeIfTruthy(searchParams.get('contract_id'));
 
     const isPasskeySupported = await isPassKeyAvailable();
     if (!public_key || !contract_id) {
-      window.location.replace(success_url || window.location.origin + (basePath ? `/${basePath}` : ''));
+      window.location.replace(
+        success_url || window.location.origin + (basePath ? `/${basePath}` : '')
+      );
       return;
     }
-    const publicKeyFak = isPasskeySupported ? await window.fastAuthController.getPublicKey() : '';
-    const existingDevice = isPasskeySupported && firebaseUser
+    const publicKeyFak = isPasskeySupported
+      ? await window.fastAuthController.getPublicKey()
+      : '';
+    const existingDevice =      isPasskeySupported && firebaseUser
       ? await window.firestoreController.getDeviceCollection(publicKeyFak)
       : null;
-    const existingDeviceLakKey = existingDevice?.publicKeys?.filter((key) => key !== publicKeyFak)[0];
+    const existingDeviceLakKey = existingDevice?.publicKeys?.filter(
+      (key) => key !== publicKeyFak
+    )[0];
 
     const oidcToken = firebaseUser?.accessToken;
-    const recoveryPk = oidcToken && (await window.fastAuthController.getUserCredential(oidcToken).catch(() => false));
+    const recoveryPk =      oidcToken
+      && (await window.fastAuthController
+        .getUserCredential(oidcToken)
+        .catch(() => false));
     const allKeys = [public_key, publicKeyFak].concat(recoveryPk || []);
     // if given lak key is already attached to webAuthN public key, no need to add it again
     const noNeedToAddKey = existingDeviceLakKey === public_key;
 
     if (noNeedToAddKey) {
-      window.parent.postMessage({
-        type:   'method',
-        method: 'query',
-        id:     1234,
-        params: {
-          request_type: 'complete_authentication',
-          publicKey:    public_key,
-          allKeys:      allKeys.join(','),
-          accountId:    (window as any).fastAuthController.getAccountId()
-        }
-      }, '*');
+      window.parent.postMessage(
+        {
+          type:   'method',
+          method: 'query',
+          id:     1234,
+          params: {
+            request_type: 'complete_authentication',
+            publicKey:    public_key,
+            allKeys:      allKeys.join(','),
+            accountId:    (window as any).fastAuthController.getAccountId(),
+          },
+        },
+        '*'
+      );
       if (!inIframe()) {
-        const parsedUrl = new URL(success_url || window.location.origin + (basePath ? `/${basePath}` : ''));
-        parsedUrl.searchParams.set('account_id', (window as any).fastAuthController.getAccountId());
+        const parsedUrl = new URL(
+          success_url
+            || window.location.origin + (basePath ? `/${basePath}` : '')
+        );
+        parsedUrl.searchParams.set(
+          'account_id',
+          (window as any).fastAuthController.getAccountId()
+        );
         parsedUrl.searchParams.set('public_key', public_key);
         parsedUrl.searchParams.set('all_keys', allKeys.join(','));
         window.location.replace(parsedUrl.href);
@@ -227,54 +266,70 @@ function AddDevicePage() {
       return;
     }
 
-    window.fastAuthController.signAndSendAddKey({
-      contractId: contract_id,
-      methodNames,
-      allowance:  new BN(NEAR_MAX_ALLOWANCE),
-      publicKey:  public_key,
-    }).then((res) => res && res.json()).then((res) => {
-      const failure = res['Receipts Outcome'].find(({ outcome: { status } }) => Object.keys(status).some((k) => k === 'Failure'))?.outcome?.status?.Failure;
-      if (failure) {
-        return failure;
-      }
+    window.fastAuthController
+      .signAndSendAddKey({
+        contractId: contract_id,
+        methodNames,
+        allowance:  new BN(NEAR_MAX_ALLOWANCE),
+        publicKey:  public_key,
+      })
+      .then((res) => res && res.json())
+      .then((res) => {
+        const failure = res['Receipts Outcome'].find(
+          ({ outcome: { status } }) => Object.keys(status).some((k) => k === 'Failure')
+        )?.outcome?.status?.Failure;
+        if (failure) {
+          return failure;
+        }
 
-      if (!firebaseUser) return null;
+        if (!firebaseUser) return null;
 
-      // Add device
-      window.firestoreController.updateUser({
-        userUid:   firebaseUser.uid,
-        // User type is missing accessToken but it exists
-        oidcToken,
-      });
+        // Add device
+        window.firestoreController.updateUser({
+          userUid: firebaseUser.uid,
+          // User type is missing accessToken but it exists
+          oidcToken,
+        });
 
-      // Since FAK is already added, we only add LAK
-      return window.firestoreController.addDeviceCollection({
-        fakPublicKey:  null,
-        lakPublicKey: public_key,
-        gateway:      success_url,
-      }).catch((err) => {
-        console.log('Failed to add device collection', err);
-        throw new Error('Failed to add device collection');
-      });
-    })
+        // Since FAK is already added, we only add LAK
+        return window.firestoreController
+          .addDeviceCollection({
+            fakPublicKey: null,
+            lakPublicKey: public_key,
+            gateway:      success_url,
+          })
+          .catch((err) => {
+            console.log('Failed to add device collection', err);
+            throw new Error('Failed to add device collection');
+          });
+      })
       .then((failure) => {
         if (failure?.ActionError?.kind?.LackBalanceForState) {
           navigate(`/devices?${searchParams.toString()}`);
         } else {
-          window.parent.postMessage({
-            type:   'method',
-            method: 'query',
-            id:     1234,
-            params: {
-              request_type: 'complete_authentication',
-              publicKey:    public_key,
-              allKeys:      allKeys.join(','),
-              accountId:    (window as any).fastAuthController.getAccountId()
-            }
-          }, '*');
+          window.parent.postMessage(
+            {
+              type:   'method',
+              method: 'query',
+              id:     1234,
+              params: {
+                request_type: 'complete_authentication',
+                publicKey:    public_key,
+                allKeys:      allKeys.join(','),
+                accountId:    (window as any).fastAuthController.getAccountId(),
+              },
+            },
+            '*'
+          );
           if (!inIframe()) {
-            const parsedUrl = new URL(success_url || window.location.origin + (basePath ? `/${basePath}` : ''));
-            parsedUrl.searchParams.set('account_id', (window as any).fastAuthController.getAccountId());
+            const parsedUrl = new URL(
+              success_url
+                || window.location.origin + (basePath ? `/${basePath}` : '')
+            );
+            parsedUrl.searchParams.set(
+              'account_id',
+              (window as any).fastAuthController.getAccountId()
+            );
             parsedUrl.searchParams.set('public_key', public_key);
             parsedUrl.searchParams.set('all_keys', allKeys.join(','));
             window.location.replace(parsedUrl.href);
@@ -284,10 +339,16 @@ function AddDevicePage() {
       .catch((error) => {
         console.log('error', error);
         captureException(error);
-        window.parent.postMessage({
-          type:    'AddDeviceError',
-          message: typeof error?.message === 'string' ? error.message : 'Something went wrong'
-        }, '*');
+        window.parent.postMessage(
+          {
+            type: 'AddDeviceError',
+            message:
+              typeof error?.message === 'string'
+                ? error.message
+                : 'Something went wrong',
+          },
+          '*'
+        );
 
         openToast({
           type:  'ERROR',
@@ -304,24 +365,27 @@ function AddDevicePage() {
       if (!isPasskeySupported) {
         const authenticated = await getAuthState();
         const isFirestoreReady = await checkFirestoreReady();
-        const firebaseAuthInvalid = authenticated === true && !isPasskeySupported && firebaseUser?.email !== data.email;
-        const shouldUseCurrentUser = authenticated === true
-        && !firebaseAuthInvalid
-        && isFirestoreReady;
+        const firebaseAuthInvalid =          authenticated === true
+          && !isPasskeySupported
+          && firebaseUser?.email !== data.email;
+        const shouldUseCurrentUser =          authenticated === true && !firebaseAuthInvalid && isFirestoreReady;
         if (shouldUseCurrentUser) {
           await handleAuthCallback();
           return;
         }
       }
       if (inIframe()) {
-        window.parent.postMessage({
-          type:   'method',
-          method: 'query',
-          id:     1234,
-          params: {
-            request_type: 'complete_authentication',
-          }
-        }, '*');
+        window.parent.postMessage(
+          {
+            type:   'method',
+            method: 'query',
+            id:     1234,
+            params: {
+              request_type: 'complete_authentication',
+            },
+          },
+          '*'
+        );
         const url = new URL(window.location.href);
         url.searchParams.set('email', data.email);
         window.open(url.toString(), '_parent');
@@ -367,10 +431,13 @@ function AddDevicePage() {
   const handleConnectWallet = () => {
     recordEvent('click-connect-wallet');
     if (!inIframe()) return;
-    window.parent.postMessage({
-      closeIframe:        true,
-      showWalletSelector:    true,
-    }, '*');
+    window.parent.postMessage(
+      {
+        closeIframe:        true,
+        showWalletSelector: true,
+      },
+      '*'
+    );
   };
 
   return (
@@ -384,8 +451,7 @@ function AddDevicePage() {
         }}
       >
         <header>
-          <h1>Sign In</h1>
-          <p className="desc">Use this account to sign in everywhere on NEAR, no password required.</p>
+          <h1>Sign in to Petastic</h1>
         </header>
         <Input
           {...register('email')}
@@ -417,51 +483,17 @@ function AddDevicePage() {
           }}
           error={errors.email?.message}
         />
-        <Button
-          type="submit"
-          size="large"
-          label={loading ? 'Loading...' : 'Continue'}
-          variant="affirmative"
-          data-test-id="add-device-continue-button"
+        <CustomButton
           disabled={loading}
-        />
-
-        <SocialLogin />
-        <SeparatorWrapper>
-          <Separator />
-          Or
-          <Separator />
-        </SeparatorWrapper>
-        <Button
-          disabled={loading}
-          size="large"
-          label={(
-            <>
-              <WalletSvg />
-              {' '}
-              Connect Wallet
-            </>
-          )}
-          variant="secondary"
-          data-test-id="connect_wallet_button"
-          iconLeft="bi bi-wallet"
-          onClick={handleConnectWallet}
-        />
+          onClick={(e) => handleSubmit(onSubmit)(e)}
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </CustomButton>
         {!getValues().email && passkeyAuthError ? (
           <ErrorContainer>
             <div className="stats-message error">
               <ErrorSvg />
-              <span>
-                Failed to authenticate, please retry with email
-                {
-                  environment.NETWORK_ID === 'testnet' && (
-                    <span>
-                      {' '}
-                      or social login
-                    </span>
-                  )
-                }
-              </span>
+              <span>Failed to authenticate, please retry with email</span>
             </div>
           </ErrorContainer>
         ) : null}
