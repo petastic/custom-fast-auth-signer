@@ -1,8 +1,6 @@
 import debug from 'debug';
 import React, { useEffect } from 'react';
-import {
-  Route, BrowserRouter as Router, Routes,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import AddDevice from './components/AddDevice/AddDevice';
 import AuthCallbackPage from './components/AuthCallback/AuthCallback';
@@ -19,6 +17,7 @@ import VerifyEmailPage from './components/VerifyEmail/verify-email';
 import FastAuthController from './lib/controller';
 import './styles/theme.css';
 import './styles/globals.css';
+import './styles/petastic.css';
 import FirestoreController from './lib/firestoreController';
 import GlobalStyle from './styles/index';
 import { initAnalytics } from './utils/analytics';
@@ -27,7 +26,7 @@ import environment from './utils/environment';
 
 (window as any).fastAuthController = new FastAuthController({
   accountId: '',
-  networkId
+  networkId,
 });
 
 if (!window.firestoreController) {
@@ -69,11 +68,19 @@ export default function App() {
             <Route path="create-account" element={<CreateAccount />} />
             <Route path="add-device" element={<AddDevice />} />
             {/* TODO: change the path for the delegates it's a breaking change that need to be done in sync with integrators */}
-            <Route path="sign" element={<SignTemplate signMethod="delegate" />} />
-            <Route path="sign-transaction" element={<SignTemplate signMethod="transaction" />} />
+            <Route
+              path="sign"
+              element={<SignTemplate signMethod="delegate" />}
+            />
+            <Route
+              path="sign-transaction"
+              element={<SignTemplate signMethod="transaction" />}
+            />
             <Route path="sign-message" element={<SignMessage />} />
             {/* TODO: This isn't available on mainnet, and isn't production ready, clean the code for production release */}
-            {environment.NETWORK_ID === 'testnet' && <Route path="sign-multichain" element={<SignMultichain />} />}
+            {environment.NETWORK_ID === 'testnet' && (
+              <Route path="sign-multichain" element={<SignMultichain />} />
+            )}
             <Route path="verify-email" element={<VerifyEmailPage />} />
             <Route path="auth-callback" element={<AuthCallbackPage />} />
             <Route path="devices" element={<Devices />} />
