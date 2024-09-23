@@ -3,8 +3,8 @@ import styled from 'styled-components';
 
 type StyledContainerProps = {
   inIframe?: boolean;
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 export const ContainerWrapper = styled.div`
   width: 100%;
@@ -24,6 +24,7 @@ export const ContainerWrapper = styled.div`
 
 function StyledContainer({ inIframe, children }: StyledContainerProps) {
   return inIframe ? children : <ContainerWrapper>{children}</ContainerWrapper>;
+  // return inIframe ? children : <div className="modal-wrapper">{children}</div>;
 }
 
 export default StyledContainer;

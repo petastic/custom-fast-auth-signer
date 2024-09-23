@@ -101,6 +101,7 @@ const schema = yup.object().shape({
 const AddDeviceForm = styled(FormContainer)`
   min-height: 275px;
   padding: 0 20px;
+  height: auto;
   gap: 18px;
   justify-content: center;
 `;
