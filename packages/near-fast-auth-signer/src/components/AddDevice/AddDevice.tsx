@@ -451,7 +451,7 @@ function AddDevicePage() {
         }}
       >
         <header>
-          <h1>Sign in to Petastic</h1>
+          <h1 className="petastic-text-left">Sign in to Petastic</h1>
         </header>
         <Input
           {...register('email')}

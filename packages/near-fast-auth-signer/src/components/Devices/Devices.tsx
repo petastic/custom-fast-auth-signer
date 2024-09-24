@@ -1,6 +1,6 @@
 import { captureException } from '@sentry/react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { styled } from 'styled-components';
 
 import { Button } from '../../lib/Button';
@@ -19,27 +19,26 @@ const DevicesWrapper = styled.div<{ inIframe?: boolean }>`
   margin: 16px auto;
   background-color: #ffffff;
   border-radius: 12px;
-  border: 1px solid #EEEEEC;
+  border: 1px solid #eeeeec;
   box-sizing: border-box;
   height: 550px;
 
   @media (min-width: 768px) {
     max-width: 380px;
   }
-  
-  
 
-  ${(props) => props.inIframe && 'margin: 0; border-bottom: none; box-shadow: none;'}
-
-  @media screen and (max-width: 767px) {
-  // Height and width will be controlled by iFrame
-  ${(props) => props.inIframe && `
+  ${(props) => props.inIframe
+    && 'margin: 0; border-bottom: none; box-shadow: none;'} @media screen and (
+    max-width: 767px) {
+    // Height and width will be controlled by iFrame
+    ${(props) => props.inIframe
+      && `
         width: 100%;
         height: 100vh;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
       `}
-}
+  }
 `;
 const DevicesWrapperInner = styled.div`
   display: flex;
@@ -53,7 +52,7 @@ const Title = styled.h2`
   font-weight: bolder;
 `;
 
-const Description = styled.p<{bold?: boolean}>`
+const Description = styled.p<{ bold?: boolean }>`
   font-size: 15px;
   ${(props) => props.bold && 'font-weight: bold;'}
 `;
@@ -80,7 +79,7 @@ const DevicesBottom = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: 1px solid #EEEEEC;
+  border-top: 1px solid #eeeeec;
   width: 100%;
   height: 70px;
   margin: 5px 0;
@@ -99,7 +98,8 @@ function Devices() {
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const public_key_lak = decodeIfTruthy(searchParams.get('public_key_lak')) || decodeIfTruthy(searchParams.get('public_key'));
+  const public_key_lak =    decodeIfTruthy(searchParams.get('public_key_lak'))
+    || decodeIfTruthy(searchParams.get('public_key'));
   const publicKeyFak = decodeIfTruthy(searchParams.get('publicKeyFak'));
 
   const onClick = (id) => {
@@ -116,22 +116,29 @@ function Devices() {
       setCollections(deviceCollections);
     };
 
-    const getKeypairOrLogout = () => window.fastAuthController.findInKeyStores(`oidc_keypair_${window.firestoreController.getUserOidcToken()}`).then((keypair) => {
-      if (keypair) {
-        getCollection();
-      } else {
-        window.fastAuthController.clearUser().then(() => {
-          setVerifyEmailRequired(true);
-          setIsLoading(false);
-        });
-      }
-    });
+    const getKeypairOrLogout = () => window.fastAuthController
+      .findInKeyStores(
+        `oidc_keypair_${window.firestoreController.getUserOidcToken()}`
+      )
+      .then((keypair) => {
+        if (keypair) {
+          getCollection();
+        } else {
+          window.fastAuthController.clearUser().then(() => {
+            setVerifyEmailRequired(true);
+            setIsLoading(false);
+          });
+        }
+      });
     setIsLoading(true);
     if (window.firestoreController.getUserOidcToken()) {
       getKeypairOrLogout();
     } else {
-      (new Promise((resolve) => { setTimeout(resolve, 5000); }))
-        .then(window.firestoreController.getUserOidcToken).then((token) => {
+      new Promise((resolve) => {
+        setTimeout(resolve, 5000);
+      })
+        .then(window.firestoreController.getUserOidcToken)
+        .then((token) => {
           if (!token) {
             setVerifyEmailRequired(true);
           } else {
@@ -144,15 +151,23 @@ function Devices() {
   const redirectToSignin = () => {
     searchParams.append('forceNoPasskey', 'true');
     if (inIframe()) {
-      window.parent.postMessage({
-        type:   'method',
-        method: 'query',
-        id:     1234,
-        params: {
-          request_type: 'complete_authentication'
-        }
-      }, '*');
-      window.open(`${window.location.origin}${basePath ? `/${basePath}` : ''}/login?${searchParams.toString()}`, '_parent');
+      window.parent.postMessage(
+        {
+          type:   'method',
+          method: 'query',
+          id:     1234,
+          params: {
+            request_type: 'complete_authentication',
+          },
+        },
+        '*'
+      );
+      window.open(
+        `${window.location.origin}${
+          basePath ? `/${basePath}` : ''
+        }/login?${searchParams.toString()}`,
+        '_parent'
+      );
     } else {
       navigate({
         pathname: '/login',
@@ -163,18 +178,22 @@ function Devices() {
 
   const onDeleteCollections = () => {
     setIsDeleting(true);
-    const list = deleteCollections
-      .map((id) => {
-        const target = collections.find((collection) => collection.id === id);
-        return {
-          firebaseId: target.firebaseId,
-          publicKeys: target.publicKeys,
-        };
-      });
+    const list = deleteCollections.map((id) => {
+      const target = collections.find((collection) => collection.id === id);
+      return {
+        firebaseId: target.firebaseId,
+        publicKeys: target.publicKeys,
+      };
+    });
 
-    return window.firestoreController.deleteDeviceCollections(list)
+    return window.firestoreController
+      .deleteDeviceCollections(list)
       .then(async () => {
-        setCollections(collections.filter((collection) => (!deleteCollections.includes(collection.id))));
+        setCollections(
+          collections.filter(
+            (collection) => !deleteCollections.includes(collection.id)
+          )
+        );
         setDeleteCollections([]);
         const contract_id = decodeIfTruthy(searchParams.get('contract_id'));
         if (contract_id && public_key_lak) {
@@ -200,7 +219,8 @@ function Devices() {
             devicePageCallback,
           });
         }
-      }).catch((err) => {
+      })
+      .catch((err) => {
         setIsDeleting(false);
         captureException(err);
         console.log('Delete Failed', err);
@@ -215,7 +235,6 @@ function Devices() {
 
   return (
     <StyledContainer inIframe={inIframe()}>
-
       <DevicesWrapper inIframe={inIframe()}>
         <DevicesWrapperInner>
           <Title>Devices with Keys</Title>
@@ -227,10 +246,7 @@ function Devices() {
               <Description>
                 You need to verify your email address to use this feature.
               </Description>
-              <Button
-                type="button"
-                onClick={redirectToSignin}
-              >
+              <Button type="button" onClick={redirectToSignin}>
                 Redirect
               </Button>
             </>
@@ -238,32 +254,43 @@ function Devices() {
             <>
               {collections.length > 0 && (
                 <Description bold>
-                  You have reached maximum number of keys. Please delete some keys to add new keys.
+                  You have reached maximum number of keys. Please delete some
+                  keys to add new keys.
                 </Description>
               )}
 
-              {
-                collections.map((collection, index) => (
-                  <Row key={collection.id}>
-                    <StyledCheckbox type="checkbox" id={collection.id} onChange={() => onClick(collection.id)} checked={deleteCollections.includes(collection.id)} data-testid={`devices-checkbox-${index}`} />
-                    <label htmlFor={collection.id} title={`Created At: ${collection.createdAt}`}>{collection.label}</label>
-                  </Row>
-                ))
-              }
+              {collections.map((collection, index) => (
+                <Row key={collection.id}>
+                  <StyledCheckbox
+                    type="checkbox"
+                    id={collection.id}
+                    onChange={() => onClick(collection.id)}
+                    checked={deleteCollections.includes(collection.id)}
+                    data-testid={`devices-checkbox-${index}`}
+                  />
+                  <label
+                    htmlFor={collection.id}
+                    title={`Created At: ${collection.createdAt}`}
+                  >
+                    {collection.label}
+                  </label>
+                </Row>
+              ))}
             </>
           )}
         </DevicesWrapperInner>
-        {
-          collections.length > 0 && (
-            <DevicesBottom>
-
-              <Button type="button" onClick={onDeleteCollections} disabled={!deleteCollections.length || isDeleting} data-testid="devices-delete-key">
-                {deleteCollectionText}
-              </Button>
-
-            </DevicesBottom>
-          )
-        }
+        {collections.length > 0 && (
+          <DevicesBottom>
+            <Button
+              type="button"
+              onClick={onDeleteCollections}
+              disabled={!deleteCollections.length || isDeleting}
+              data-testid="devices-delete-key"
+            >
+              {deleteCollectionText}
+            </Button>
+          </DevicesBottom>
+        )}
       </DevicesWrapper>
     </StyledContainer>
   );

@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
-const FormContainer = styled.form<{ inIframe?: boolean }>`
-  width: auto;
+const PetasticFormContainer = styled.form<{ inIframe?: boolean }>`
+  width: 375px;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 12px;
   display: flex;
@@ -51,4 +52,4 @@ const FormContainer = styled.form<{ inIframe?: boolean }>`
   }
 `;
 
-export default FormContainer;
+export default PetasticFormContainer;
