@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
-const FormContainer = styled.form<{ inIframe?: boolean }>`
-  width: auto;
+const FormContainer = styled.form<{ inIframe?: boolean; className?: string }>`
+  width: 375px;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 12px;
   display: flex;
