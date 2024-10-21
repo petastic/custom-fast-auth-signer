@@ -15,9 +15,12 @@ function AuthIndicator() {
   }, [authenticated, navigate]);
 
   return (
-    <AuthIndicatorButton data-test-id="auth-indicator-button" $buttonType="secondary" $isSignedIn={authenticated && authenticated !== 'loading'}>
-      {authenticated ? <p>signed in</p>
-        : <p>not signed in</p>}
+    <AuthIndicatorButton
+      data-test-id="auth-indicator-button"
+      $buttonType="secondary"
+      $isSignedIn={authenticated && authenticated !== 'loading'}
+    >
+      {authenticated ? <p>Logged in to Petastic</p> : <p>Not authenticated.</p>}
     </AuthIndicatorButton>
   );
 }
