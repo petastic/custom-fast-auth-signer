@@ -8,7 +8,6 @@ import isEmail from 'validator/lib/isEmail';
 import * as yup from 'yup';
 
 import { CreateAccountFormValues } from '../../hooks/useCreateAccount';
-import { Button } from '../../lib/Button';
 import Input from '../../lib/Input/Input';
 import { openToast } from '../../lib/Toast';
 import { recordEvent } from '../../utils/analytics';
@@ -19,6 +18,7 @@ import {
   getEmailId,
 } from '../../utils/form-validation';
 import { FormContainer } from '../Layout';
+import { CustomButton } from '../Petastic/Forms/CustomButton';
 // eslint-disable-next-line import/no-cycle
 
 const CreateAccountFormContainer = styled(FormContainer)`
@@ -172,19 +172,23 @@ const CreateAccountForm = forwardRef<HTMLFormElement, CreateAccountFormProps>(
 
     return (
       <CreateAccountFormContainer ref={ref} onSubmit={handleSubmit(onSubmit)}>
+        <div
+          style={{
+            display:        'flex',
+            justifyContent: 'start',
+            marginBottom:   '20px',
+          }}
+        >
+          <img
+            src="https://supernova-assets.s3.us-west-1.amazonaws.com/logos/logo.svg"
+            alt="Petastic"
+            height="32px"
+          />
+        </div>
         <header>
-          <h1 data-test-id="heading_create">Create account</h1>
-          <p className="desc">
-            <span>Have an account?</span>
-            {' '}
-            <Link
-              to={{ pathname: '/login', search: loginQueryParam() }}
-              data-test-id="create_login_link"
-              onClick={handleSignInClick}
-            >
-              Sign in
-            </Link>
-          </p>
+          <h1 data-test-id="heading_create" className="petastic-text-left">
+            Sign up for Petastic
+          </h1>
         </header>
         <Input
           {...register('email')}
@@ -241,14 +245,20 @@ const CreateAccountForm = forwardRef<HTMLFormElement, CreateAccountFormProps>(
             success: 'create-error-subtext',
           }}
         />
-        <Button
-          disabled={!isValid || loading}
-          label={loading ? 'Please wait...' : 'Continue'}
-          variant="affirmative"
-          type="submit"
-          size="large"
-          data-test-id="continue_button_create"
-        />
+        <CustomButton disabled={!isValid || loading} buttonType="submit">
+          {loading ? 'Please wait...' : 'Continue'}
+        </CustomButton>
+        <p className="desc">
+          <span>Have an account? </span>
+          {' '}
+          <Link
+            to={{ pathname: '/login', search: loginQueryParam() }}
+            data-test-id="create_login_link"
+            onClick={handleSignInClick}
+          >
+            Sign in
+          </Link>
+        </p>
       </CreateAccountFormContainer>
     );
   }

@@ -7,7 +7,7 @@ import React, {
   useCallback, useEffect, useRef, useState
 } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import * as yup from 'yup';
 
@@ -357,6 +357,10 @@ function AddDevicePage() {
       .finally(() => setInFlight(false));
   }, [firebaseUser, navigate, searchParams]);
 
+  const handleSignUpClick = () => {
+    recordEvent('click-signup-continue');
+  };
+
   const onSubmit = async (data: { email: string }) => {
     setIsProcessingAuth(true);
     try {
@@ -430,6 +434,8 @@ function AddDevicePage() {
   return (
     <StyledContainer inIframe={inIframe()}>
       <AddDeviceForm
+        className="petastic-login-wrapper"
+        id="nfw-login-wrapper"
         ref={addDeviceFormRef}
         inIframe={inIframe()}
         onSubmit={(e) => {
@@ -437,8 +443,21 @@ function AddDevicePage() {
           return handleSubmit(onSubmit)(e);
         }}
       >
+        <div
+          style={{
+            display:        'flex',
+            justifyContent: 'start',
+            marginBottom:   '20px',
+          }}
+        >
+          <img
+            src="https://supernova-assets.s3.us-west-1.amazonaws.com/logos/logo.svg"
+            alt="Petastic"
+            height="32px"
+          />
+        </div>
         <header>
-          <h1 className="text-">Sign in to Petastic</h1>
+          <h1 className="petastic-text-left">Sign in to Petastic</h1>
         </header>
         <Input
           {...register('email')}
@@ -476,6 +495,16 @@ function AddDevicePage() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </CustomButton>
+        <p className="desc">
+          <span>Need to register? </span>
+          <Link
+            to={{ pathname: '/create-account' }}
+            data-test-id="create_register_link"
+            onClick={handleSignUpClick}
+          >
+            Sign up
+          </Link>
+        </p>
         {!getValues().email && passkeyAuthError ? (
           <ErrorContainer>
             <div className="stats-message error">

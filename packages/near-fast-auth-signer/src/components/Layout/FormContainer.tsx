@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const FormContainer = styled.form<{ inIframe?: boolean }>`
+const FormContainer = styled.form<{ inIframe?: boolean; className?: string }>`
   width: 375px;
   background-color: #ffffff;
   padding: 20px;
@@ -8,25 +8,26 @@ const FormContainer = styled.form<{ inIframe?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 32px;
-  border: 1px solid #EEEEEC;
-  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.06), 0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 12px 20px 0px rgba(0, 0, 0, 0.08);
-  
+
   header {
     text-align: center;
+
     h1 {
       font: var(--text-xl);
       font-weight: bold;
     }
-    .desc{
+
+    .desc {
       margin-bottom: 1px;
     }
+
     .desc span {
-      color: #706F6C;
+      color: #706f6c;
     }
   }
-  
+
   & > p {
-    color: #706F6C;
+    color: #706f6c;
     font-size: 14px;
   }
 
@@ -35,14 +36,14 @@ const FormContainer = styled.form<{ inIframe?: boolean }>`
   }
 
   @media (min-width: 768px) {
-      max-width: 380px;
+    max-width: 380px;
   }
 
-  ${(props) => props.inIframe && 'margin: 0;'}
-
-  @media screen and (max-width: 767px) {
-  // Height and width will be controlled by iFrame
-    ${(props) => props.inIframe && `
+  ${(props) => props.inIframe && 'margin: 0;'} @media screen and (
+    max-width: 767px) {
+    // Height and width will be controlled by iFrame
+    ${(props) => props.inIframe
+      && `
         width: 100%;
         height: 100%;
         border-bottom-left-radius: 0;
