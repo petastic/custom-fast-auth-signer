@@ -24,7 +24,6 @@ export const ContainerWrapper = styled.div`
 
 function StyledContainer({ inIframe, children }: StyledContainerProps) {
   return inIframe ? children : <ContainerWrapper>{children}</ContainerWrapper>;
-  // return inIframe ? children : <div className="modal-wrapper">{children}</div>;
 }
 
 export default StyledContainer;
