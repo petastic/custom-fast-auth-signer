@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Primary Blue #2c4cff */
 
 .petastic-button {
@@ -23,18 +27,17 @@
     background-color: #4c75ff;
 }
 
-.modal-wrapper {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+.petastic-text-left {
+    width: 100% !important;
+    text-align: left !important;
 }
 
-@media (min-width: 1024px) {
-    .modal-wrapper {
-        position: absolute;
-        left: 0px;
-        top: 50%;
-        transform: translate(-50%, 0%);
+.petastic-login-wrapper {
+    @media (max-width: 500px) {
+        width: 100% !important;
+    }
+
+    @media (min-width: 501px) {
+        width: 380px !important;
     }
 }
