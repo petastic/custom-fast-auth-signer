@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+=======
+>>>>>>> 04a70da (Adjustments to the styling of register)
 /* Primary Blue #2c4cff */
 
 .petastic-button {
@@ -24,20 +27,4 @@
 .petastic-button:hover {
     color: #FFFFFF;
     background-color: #4c75ff;
-}
-
-.modal-wrapper {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-@media (min-width: 1024px) {
-    .modal-wrapper {
-        position: absolute;
-        left: 0px;
-        top: 50%;
-        transform: translate(-50%, 0%);
-    }
 }

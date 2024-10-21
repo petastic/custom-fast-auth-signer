@@ -1,18 +1,70 @@
-# fast-auth-signer ![Docker Pulls](https://img.shields.io/docker/pulls/nearprotocol/fast-auth-sdk-frontend?link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnearprotocol%2Ffast-auth-sdk-frontend)
-Monorepo for fast-auth-signer functionality - contains frontend app, and associated E2E test suites defined using Playwright
+# Petastic Auth
 
-## Packages
-#### [near-fast-auth-signer](./packages/near-fast-auth-signer/README.md)
-Web application designed primarily for usage via embedding into parent site using an iframe 
-#### [near-fast-auth-signer-e2e-tests](./packages/near-fast-auth-signer-e2e-tests/README.md)
-E2E test suites for `near-fast-auth-signer` using Playwright tests.
+## Overview
 
-## Usage
-This repository leverages Yarn workspaces.  
+This monorepo consists of a test application and two third-party submodules:
 
-#### Local Development
-Run `yarn` from the repository root. This will install dependencies for all packages by way of Yarn workspaces functionality.
-#### Run your own instance
-Instructions to run your own instance of the signer app can be found [here](https://docs.near.org/tools/fastauth-sdk#setting-up-the-frontend).
-#### End-to-End tests
-Run `yarn test` from the repository root.
+- **pagoda-relayer-rs** (develop branch)
+- **fast-auth-signer** (main branch)
+
+## Directory Structure
+
+- `config/`: Contains configuration files for the third-party apps.
+- `test-app/`: simple test app.
+- `pagoda-relayer-rs/`: Contains the Pagoda Relayer application.
+- `fast-auth-signer/`: Contains the Fast Auth Signer application.
+
+## Architecture
+
+In order to abstract away any notion of blockchain from users and to avoid forcing new users to "fund" their wallets
+a relay service is required to be the middle-man which can allow us to
+
+## Syncing Submodules
+
+1. From the root of the repository, initialize and update the submodules:
+
+   ```bash
+   git submodule update --init --recursive
+
+## Running the Applications Individually
+
+### Test App
+
+1. Navigate to the `test-app` directory.
+2. Build Deps:
+   ```bash
+   yarn install
+   ```
+3. Run the application:
+   ```bash
+   yarn start
+   ```
+
+### Fast Auth Signer
+
+1. Navigate to the `near-fast-auth-signer` directory.
+   ```bash
+   cd fast-auth-signer/packages/near-fast-auth-signer
+   ```
+2. Build the app:
+   ```bash
+   yarn install
+   ```
+3. Run the application on testnet:
+   ```bash
+   NETWORK_ID=testnet yarn start
+   ```
+
+## Running All Applications with Docker Compose
+
+1. Make sure you have Docker and Docker Compose installed.
+2. From the root of the repository, run:
+   ```bash
+   docker-compose up --build
+   ```
+3. The services will start, and you can access them based on the port mappings defined in the `docker-compose.yml` file.
+
+## Configuration
+
+- All configuration files for the third-party applications are located in the `config/` directory.
+- Ensure that you customize the configuration files as needed for your environment.
