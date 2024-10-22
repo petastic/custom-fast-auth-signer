@@ -177,6 +177,7 @@ const CreateAccountForm = forwardRef<HTMLFormElement, CreateAccountFormProps>(
             display:        'flex',
             justifyContent: 'start',
             marginBottom:   '20px',
+            paddingTop:     '20px',
           }}
         >
           <img

@@ -450,6 +450,7 @@ function AddDevicePage() {
             display:        'flex',
             justifyContent: 'start',
             marginBottom:   '20px',
+            paddingTop:     '20px',
           }}
         >
           <img
